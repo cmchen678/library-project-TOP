@@ -1,6 +1,6 @@
 "use strict";
 
-const container = document.querySelector('.container');
+const bookContainer = document.querySelector('.book-container');
 const dialog = document.querySelector('#book-input');
 const form = document.querySelector('#book-form');
 
@@ -39,9 +39,12 @@ function addBookToLibrary(title, author, pages, read) {
 }
 
 function displayLibrary() {
+    bookContainer.innerHTML = '';
+
     for (const book of myLibrary) {
         const bookCard = document.createElement('div');
         bookCard.classList.add('book-card');
+        bookCard.dataset.id = book.id;
 
         const title = document.createElement('h2');
         title.textContent = book.title;
@@ -55,34 +58,70 @@ function displayLibrary() {
         const read = document.createElement('p');
         read.textContent = book.read;
 
-        bookCard.append(title, author, pages, read);
-        container.append(bookCard);
+        const readBtn = document.createElement('button');
+        readBtn.classList.add('read-btn');
+        if (book.read === 'read') {
+            readBtn.textContent = 'Mark Unread';
+        } else {
+            readBtn.textContent = 'Mark Read';
+        }
+
+        const removeBtn = document.createElement('button');
+        removeBtn.classList.add('remove-btn');
+        removeBtn.textContent = 'Remove Book';
+
+        bookCard.append(title, author, pages, read, readBtn, removeBtn);
+        bookContainer.append(bookCard);
     }
 }
 
 function displayBook() {
-        const lastBook = myLibrary.at(-1);
+    const lastBook = myLibrary.at(-1);
 
-        const bookCard = document.createElement('div');
-        bookCard.classList.add('book-card');
+    const bookCard = document.createElement('div');
+    bookCard.classList.add('book-card');
+    bookCard.dataset.id = lastBook.id;
 
-        const title = document.createElement('h2');
-        title.textContent = lastBook.title;
+    const title = document.createElement('h2');
+    title.textContent = lastBook.title;
 
-        const author = document.createElement('p');
-        author.textContent = lastBook.author;
+    const author = document.createElement('p');
+    author.textContent = lastBook.author;
 
-        const pages = document.createElement('p');
-        pages.textContent = lastBook.pages;
+    const pages = document.createElement('p');
+    pages.textContent = lastBook.pages;
 
-        const read = document.createElement('p');
-        read.textContent = lastBook.read;
+    const read = document.createElement('p');
+    read.textContent = lastBook.read;
 
-        bookCard.append(title, author, pages, read);
-        container.append(bookCard);
+    const readBtn = document.createElement('button');
+    readBtn.classList.add('read-btn');
+    if (lastBook.read.toLowerCase() === 'read') {
+        readBtn.textContent = 'Mark Unread';
+    } else {
+        readBtn.textContent = 'Mark Read';
+    }
+
+    const removeBtn = document.createElement('button');
+    removeBtn.classList.add('remove-btn');
+    removeBtn.textContent = 'Remove Book';
+
+    bookCard.append(title, author, pages, read, readBtn, removeBtn);
+    bookContainer.append(bookCard);
 }
 
 addBookToLibrary("Atomic Habits", "James Clear", 320, "Read");
 addBookToLibrary("Man's Search for Meaning", "Viktor E. Frankl", 165, "Read");
 
 displayLibrary();
+
+bookContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('remove-btn')) {
+        const bookCard = event.target.closest('.book-card');
+        const idToRemove = bookCard.dataset.id;
+        const index = myLibrary.findIndex(book => book.id === idToRemove);
+        myLibrary.splice(index, 1);
+        displayLibrary();
+        console.log(idToRemove);
+    }
+})
