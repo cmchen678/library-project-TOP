@@ -3,6 +3,11 @@
 const bookContainer = document.querySelector('.book-container');
 const dialog = document.querySelector('#book-input');
 const form = document.querySelector('#book-form');
+const myLibrary = [];
+
+dialog.addEventListener('close', () => {
+    form.reset();
+})
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -19,8 +24,6 @@ form.addEventListener('submit', (event) => {
     dialog.close();
 })
 
-const myLibrary = [];
-
 const Book = function(title, author, pages, read) {
     if (!new.target) {
         throw Error("You must use the 'new operator' to call the constructor");
@@ -31,6 +34,15 @@ const Book = function(title, author, pages, read) {
     this.pages = pages;
     this.read = read;
     this.id = crypto.randomUUID();
+}
+
+Book.prototype.readStatus = function() {
+    if (this.read === 'Yes') {
+        this.read = 'No';
+    } else {
+        this.read = 'Yes';
+    }
+    displayLibrary();
 }
 
 function addBookToLibrary(title, author, pages, read) {
@@ -56,11 +68,11 @@ function displayLibrary() {
         pages.textContent = book.pages;
 
         const read = document.createElement('p');
-        read.textContent = book.read;
+        read.textContent = `Read: ${book.read}`;
 
         const readBtn = document.createElement('button');
         readBtn.classList.add('read-btn');
-        if (book.read === 'read') {
+        if (book.read === 'Yes') {
             readBtn.textContent = 'Mark Unread';
         } else {
             readBtn.textContent = 'Mark Read';
@@ -92,11 +104,11 @@ function displayBook() {
     pages.textContent = lastBook.pages;
 
     const read = document.createElement('p');
-    read.textContent = lastBook.read;
+    read.textContent = `Read: ${lastBook.read}`;
 
     const readBtn = document.createElement('button');
     readBtn.classList.add('read-btn');
-    if (lastBook.read.toLowerCase() === 'read') {
+    if (lastBook.read === 'Yes') {
         readBtn.textContent = 'Mark Unread';
     } else {
         readBtn.textContent = 'Mark Read';
@@ -110,18 +122,27 @@ function displayBook() {
     bookContainer.append(bookCard);
 }
 
-addBookToLibrary("Atomic Habits", "James Clear", 320, "Read");
-addBookToLibrary("Man's Search for Meaning", "Viktor E. Frankl", 165, "Read");
-
-displayLibrary();
-
 bookContainer.addEventListener('click', (event) => {
     if (event.target.classList.contains('remove-btn')) {
         const bookCard = event.target.closest('.book-card');
-        const idToRemove = bookCard.dataset.id;
-        const index = myLibrary.findIndex(book => book.id === idToRemove);
+        const id = bookCard.dataset.id;
+        const index = myLibrary.findIndex(book => book.id === id);
         myLibrary.splice(index, 1);
         displayLibrary();
-        console.log(idToRemove);
     }
 })
+
+bookContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('read-btn')) {
+        const bookCard = event.target.closest('.book-card');
+        const id = bookCard.dataset.id;
+        const index = myLibrary.findIndex(book => book.id === id);
+        myLibrary[index].readStatus();
+        displayLibrary();
+    }
+})
+
+addBookToLibrary("Atomic Habits", "James Clear", 320, "Yes");
+addBookToLibrary("Man's Search for Meaning", "Viktor E. Frankl", 165, "Yes");
+
+displayLibrary();

@@ -19,7 +19,13 @@
                 <label for="book_pages">Pages:</label>
                 <input type="number" id="book_pages" name="book_pages"/>
                 <label for="book_read">Read:</label>
-                <input type="text" id="book_read" name="book_read"/>
+                <p>Have you read this book?</p>
+                <label>
+                    <input type="radio" name="book_read" value="Yes"/> Yes
+                </label>
+                <label>
+                    <input type="radio" name="book_read" value="No"/> No
+                </label>             
                 <button class="submit-btn" type="submit" action="" method="POST">Add Book</button>
             </form>
         </dialog>
