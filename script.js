@@ -3,7 +3,6 @@
 const container = document.querySelector('.container');
 const dialog = document.querySelector('#book-input');
 const form = document.querySelector('#book-form');
-const submitBtn = document.querySelector('.submit-btn');
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -15,19 +14,7 @@ form.addEventListener('submit', (event) => {
     const read = formData.get('book_read');
 
     addBookToLibrary(title, author, pages, read);
-})
-
-submitBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-    const title = formData.get('book_title');
-    const author = formData.get('book_author');
-    const pages = formData.get('book_pages');
-    const read = formData.get('book_read');
-
-    addBookToLibrary(title, author, pages, read);
-    displayBooks();
+    displayBook();
     form.reset();
     dialog.close();
 })
@@ -51,11 +38,10 @@ function addBookToLibrary(title, author, pages, read) {
     myLibrary.push(book);
 }
 
-function displayBooks() {
+function displayLibrary() {
     for (const book of myLibrary) {
         const bookCard = document.createElement('div');
         bookCard.classList.add('book-card');
-        container.append(bookCard);
 
         const title = document.createElement('h2');
         title.textContent = book.title;
@@ -70,10 +56,33 @@ function displayBooks() {
         read.textContent = book.read;
 
         bookCard.append(title, author, pages, read);
+        container.append(bookCard);
     }
+}
+
+function displayBook() {
+        const lastBook = myLibrary.at(-1);
+
+        const bookCard = document.createElement('div');
+        bookCard.classList.add('book-card');
+
+        const title = document.createElement('h2');
+        title.textContent = lastBook.title;
+
+        const author = document.createElement('p');
+        author.textContent = lastBook.author;
+
+        const pages = document.createElement('p');
+        pages.textContent = lastBook.pages;
+
+        const read = document.createElement('p');
+        read.textContent = lastBook.read;
+
+        bookCard.append(title, author, pages, read);
+        container.append(bookCard);
 }
 
 addBookToLibrary("Atomic Habits", "James Clear", 320, "Read");
 addBookToLibrary("Man's Search for Meaning", "Viktor E. Frankl", 165, "Read");
 
-displayBooks();
+displayLibrary();
