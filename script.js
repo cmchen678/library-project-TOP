@@ -18,36 +18,68 @@ form.addEventListener('submit', (event) => {
     const pages = formData.get('book_pages');
     const read = formData.get('book_read');
 
-    addBookToLibrary(title, author, pages, read);
-    displayBook();
+    const book = new Book(title, author, pages, read)
+    book.addBookToLibrary();
+    book.displayBook();
     form.reset();
     dialog.close();
 })
 
-const Book = function(title, author, pages, read) {
-    if (!new.target) {
-        throw Error("You must use the 'new operator' to call the constructor");
+class Book {
+    constructor(title, author, pages, read) {
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.read = read;
+        this.id = crypto.randomUUID();
     }
 
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.read = read;
-    this.id = crypto.randomUUID();
-}
-
-Book.prototype.readStatus = function() {
-    if (this.read === 'Yes') {
-        this.read = 'No';
-    } else {
-        this.read = 'Yes';
+    addBookToLibrary() {
+        myLibrary.push(this);
     }
-    displayLibrary();
-}
 
-function addBookToLibrary(title, author, pages, read) {
-    const book = new Book(title, author, pages, read);
-    myLibrary.push(book);
+    displayBook() {
+        const bookCard = document.createElement('div');
+        bookCard.classList.add('book-card');
+        bookCard.dataset.id = this.id;
+
+        const title = document.createElement('h2');
+        title.textContent = this.title;
+
+        const author = document.createElement('p');
+        author.textContent = this.author;
+
+        const pages = document.createElement('p');
+        pages.textContent = this.pages;
+
+        const read = document.createElement('p');
+        read.textContent = `Read: ${this.read}`;
+
+        const readBtn = document.createElement('button');
+        readBtn.classList.add('read-btn');
+        if (this.read === 'Yes') {
+            readBtn.textContent = 'Mark Unread';
+        } else {
+            readBtn.textContent = 'Mark Read';
+        }
+
+        const removeBtn = document.createElement('button');
+        removeBtn.classList.add('remove-btn');
+        removeBtn.textContent = 'Remove Book';
+
+        bookCard.append(title, author, pages, read, readBtn, removeBtn);
+        bookContainer.append(bookCard);
+    }
+
+    readStatus() {
+        if (this.read === 'Yes') {
+            this.read = 'No';
+        } else {
+            this.read = 'Yes';
+        }
+        this.displayBook();
+    }
+
 }
 
 function displayLibrary() {
@@ -87,41 +119,6 @@ function displayLibrary() {
     }
 }
 
-function displayBook() {
-    const lastBook = myLibrary.at(-1);
-
-    const bookCard = document.createElement('div');
-    bookCard.classList.add('book-card');
-    bookCard.dataset.id = lastBook.id;
-
-    const title = document.createElement('h2');
-    title.textContent = lastBook.title;
-
-    const author = document.createElement('p');
-    author.textContent = lastBook.author;
-
-    const pages = document.createElement('p');
-    pages.textContent = lastBook.pages;
-
-    const read = document.createElement('p');
-    read.textContent = `Read: ${lastBook.read}`;
-
-    const readBtn = document.createElement('button');
-    readBtn.classList.add('read-btn');
-    if (lastBook.read === 'Yes') {
-        readBtn.textContent = 'Mark Unread';
-    } else {
-        readBtn.textContent = 'Mark Read';
-    }
-
-    const removeBtn = document.createElement('button');
-    removeBtn.classList.add('remove-btn');
-    removeBtn.textContent = 'Remove Book';
-
-    bookCard.append(title, author, pages, read, readBtn, removeBtn);
-    bookContainer.append(bookCard);
-}
-
 bookContainer.addEventListener('click', (event) => {
     if (event.target.classList.contains('remove-btn')) {
         const bookCard = event.target.closest('.book-card');
@@ -142,7 +139,8 @@ bookContainer.addEventListener('click', (event) => {
     }
 })
 
-addBookToLibrary("Atomic Habits", "James Clear", 320, "Yes");
-addBookToLibrary("Man's Search for Meaning", "Viktor E. Frankl", 165, "Yes");
-
+const atomicHabits = new Book("Atomic Habits", "James Clear", 320, "Yes");
+atomicHabits.addBookToLibrary();
+const searchForMeaning = new Book("Man's Search for Meaning", "Viktor E. Frankl", 165, "Yes");
+searchForMeaning.addBookToLibrary();
 displayLibrary();
